@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Entry</title>
+</head>
+<body>
+    <h1>Add Entry</h1>
+    <form id="entryForm">
+        <label>Date: <input type="date" id="date" required></label><br><br>
+        <label>Comment:<br>
+        <textarea id="comment" rows="4" cols="50" required></textarea></label><br><br>
+        <button type="submit">Save</button>
+    </form>
+    <br>
+    <a href="view.html">View Entries</a>
+
+    <script>
+        document.getElementById('entryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const date = document.getElementById('date').value;
+            const comment = document.getElementById('comment').value;
+
+            const res = await fetch('/api/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date, comment })
+            });
+
+            if (res.ok) {
+                alert('Entry saved!');
+                document.getElementById('entryForm').reset();
+            } else {
+                alert('Failed to save');
+            }
+        });
+    </script>
+</body>
+</html>

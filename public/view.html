@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Entries</title>
+</head>
+<body>
+    <h1>Entries</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Comment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="dataTable"></tbody>
+    </table>
+    <br>
+    <a href="index.html">Add New Entry</a>
+
+    <script>
+        async function loadData() {
+            const res = await fetch('/api/data');
+            const data = await res.json();
+            const table = document.getElementById('dataTable');
+            table.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td><input type="date" value="${item.date}" id="date-${item.id}"></td>
+                    <td><input type="text" value="${item.comment}" id="comment-${item.id}"></td>
+                    <td>
+                        <button onclick="updateEntry(${item.id})">Update</button>
+                        <button onclick="deleteEntry(${item.id})">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        async function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                await fetch(`/api/data/${id}`, { method: 'DELETE' });
+                loadData();
+            }
+        }
+
+        async function updateEntry(id) {
+            const date = document.getElementById(`date-${id}`).value;
+            const comment = document.getElementById(`comment-${id}`).value;
+            await fetch(`/api/data/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date, comment })
+            });
+            alert('Entry updated');
+            loadData();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
